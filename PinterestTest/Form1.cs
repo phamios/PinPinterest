@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -24,7 +25,11 @@ namespace PinterestTest
 
 		private void btnGetUser_Click(object sender, EventArgs e)
 		{
-			try
+            AccessToken = textBox1.Text;
+            appID = textBox2.Text;
+            appSecret = textBox3.Text;
+
+            try
 			{				
 				user = service.getUser();
 
@@ -179,7 +184,7 @@ namespace PinterestTest
 			try
 			{
 				string boardID = lbBoards.SelectedValue.ToString();
-				Pin pin = service.createPin(boardID, "TEST NOTE", imageURL, imageURL);
+				Pin pin = service.createPin(boardID, txtPinNote.Text, imageURL, imageURL);
 				if (pin != null)
 					this.getPins();
 			}
@@ -193,7 +198,7 @@ namespace PinterestTest
 		{
 			try
 			{
-				Board board = service.createBoard("TEST_BOARD", "description");
+				Board board = service.createBoard(txtBoardName.Text, txtBoardDescription.Text);
 				if (board != null)
 					this.getBoards();
 			}
@@ -219,5 +224,40 @@ namespace PinterestTest
 				Debug.WriteLine("Exception in Form1.btnDeleteBoard_Click(): " + E.Message);
 			}
 		}
-	}
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
+        private void ReadInTimeSheet()
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            if (ofd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string fileToOpen = ofd.FileName;
+                //var fileLines = File.ReadAllLines(@"C:\filepath\MyTimeSheet.txt");
+                var fileLines = File.ReadAllLines(fileToOpen);
+                for (int i = 0; i + 4 < fileLines.Length; i += 5)
+                {
+                    listView1.Items.Add(
+                        new ListViewItem(new[]
+                        {
+                            fileLines[i],
+                            fileLines[i + 1],
+                            fileLines[i + 2],
+                            fileLines[i + 3],
+                            fileLines[i + 4]
+                        }));
+                }
+
+                // Resize the columns
+                for (int i = 0; i < listView1.Columns.Count; i++)
+                {
+                    listView1.Columns[i].Width = -2;
+                } 
+            } 
+        }
+    }
 }
